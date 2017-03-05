@@ -1,0 +1,6 @@
+# installed packages
+node_modules/
+
+# project files
+.idea/workspace.xml
+.idea/tasks.xml

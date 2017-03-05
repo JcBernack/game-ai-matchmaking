@@ -1,0 +1,14 @@
+{
+  "name": "game-ai-matchmaking",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "J.C.Bernack",
+  "license": "MIT",
+  "dependencies": {
+    "carrier": "^0.3.0"
+  }
+}
