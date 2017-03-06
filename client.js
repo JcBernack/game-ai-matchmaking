@@ -9,7 +9,7 @@ const actions = {
 
 const socket = new net.Socket();
 socket.connect(5000, "127.0.0.1", function () {
-    console.log("Connected");
+    console.log("Connected to", socket.address());
 });
 
 function send(message) {

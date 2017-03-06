@@ -1,7 +1,7 @@
 const net = require("net");
 const carrier = require("carrier");
-const ConnectFour = require("./connect_four");
 const MatchmakingFsm = require("./matchmaking");
+const config = require("./config");
 
 let idCounter = 1;
 const clients = {};
@@ -18,7 +18,7 @@ function dropClient(id) {
     clients[id].destroy();
 }
 
-const fsm = new MatchmakingFsm({Game: ConnectFour});
+const fsm = new MatchmakingFsm(config.options);
 // fsm.on("transition", data => console.log("state change:", data.fromState, "->", data.toState));
 // fsm.on("handling", data => console.log("handling event:", data.inputType));
 fsm.on("send", send);
@@ -52,6 +52,6 @@ function connectionListener(socket) {
 }
 
 const server = net.createServer(connectionListener);
-server.listen(5000, function () {
-    console.log("Server running at on port 5000");
+server.listen(config.port, config.hostname, function () {
+    console.log("Server running at on:", server.address());
 });
