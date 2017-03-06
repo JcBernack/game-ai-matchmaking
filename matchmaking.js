@@ -53,8 +53,8 @@ const MatchmakingFsm = machina.Fsm.extend({
                 if (a <= b) b++;
                 a = this.clients[a];
                 b = this.clients[b];
+                console.log(`Start match ${this.permutationIndex} ${a} vs ${b}`);
                 this.permutationIndex++;
-                console.log("Start match", this.permutationIndex,":", a, "vs", b);
                 this.game = new this.Game(a, b);
                 const description = actions.start(this.game.describe());
                 this.emit("send", a, description);
@@ -65,26 +65,26 @@ const MatchmakingFsm = machina.Fsm.extend({
         nextMove: {
             _onEnter: function () {
                 const state = this.game.state();
+                if (state[0] != "move") {
+                    console.log(this.game.toString());
+                }
                 switch (state[0]) {
                     case "move":
                         this.emit("send", state[1], actions.state("move"));
                         this.transition("clientMove");
                         break;
                     case "won":
-                        console.log("Game ended with a winner after", this.game.moves, "moves");
+                        console.log(`Client ${state[1]} won after ${this.game.moves} moves`);
                         this.emit("send", state[1], actions.state("won"));
                         this.emit("send", state[2], actions.state("loss"));
                         this.transition("startMatch");
                         break;
                     case "tie":
-                        console.log("Game ended in a tie after", this.game.moves, "moves");
+                        console.log(`Game ended in a tie after ${this.game.moves} moves`);
                         this.emit("send", state[1], actions.state("tie"));
                         this.emit("send", state[2], actions.state("tie"));
                         this.transition("startMatch");
                         break;
-                }
-                if (state[0] != "move") {
-                    console.log(this.game.toString());
                 }
             },
         },
@@ -101,6 +101,7 @@ const MatchmakingFsm = machina.Fsm.extend({
                 } else {
                     console.log("Invalid move by client", id, move);
                     this.handle("abortMatch");
+                    this.emit("dropClient", id);
                 }
             },
             timeout: function () {

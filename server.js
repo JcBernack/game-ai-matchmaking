@@ -19,8 +19,8 @@ function dropClient(id) {
 }
 
 const fsm = new MatchmakingFsm({Game: ConnectFour});
-fsm.on("transition", data => console.log("state change:", data.fromState, "->", data.toState));
-fsm.on("handling", data => console.log("handling event:", data.inputType));
+// fsm.on("transition", data => console.log("state change:", data.fromState, "->", data.toState));
+// fsm.on("handling", data => console.log("handling event:", data.inputType));
 fsm.on("send", send);
 fsm.on("broadcast", broadcast);
 fsm.on("dropClient", dropClient);

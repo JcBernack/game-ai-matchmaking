@@ -89,7 +89,7 @@ class ConnectFour {
             }
             rows.unshift(row);
         }
-        return rows.reduce((current, row) => current + row + "\n", "");
+        return rows.join("\n");
     }
 }
 
