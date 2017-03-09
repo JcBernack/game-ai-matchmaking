@@ -11,6 +11,9 @@ class GameClient:
         message = json.dumps(action) + "\n"
         self.socket.sendall(message.encode())
 
+    def action(self, action):
+        print("Received unhandled action:", action)
+
     def run(self):
         buffer = ""
         while True:
@@ -28,4 +31,10 @@ class GameClient:
                 action = json.loads(line)
                 # print("Received action:", action)
                 # call a class method with name of action.type if existing
-                getattr(self, action["type"])(action)
+                try:
+                    if action["type"] == "state":
+                        getattr(self, action["state"])()
+                    else:
+                        getattr(self, action["type"])(action)
+                except AttributeError:
+                    self.action(action)
