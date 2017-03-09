@@ -12,7 +12,15 @@ class GameClient:
         self.socket.sendall(message.encode())
 
     def action(self, action):
-        print("Received unhandled action:", action)
+        try:
+            if action["type"] == "state":
+                # call a class method with name action.state if existing
+                getattr(self, action["state"])()
+            else:
+                # call a class method with name action.type if existing
+                getattr(self, action["type"])(action)
+        except AttributeError:
+            print("Received unhandled action:", action)
 
     def run(self):
         buffer = ""
@@ -29,12 +37,5 @@ class GameClient:
                 line, buffer = buffer.split('\n', 1)
                 # decode the message into an object
                 action = json.loads(line)
-                # print("Received action:", action)
-                # call a class method with name of action.type if existing
-                try:
-                    if action["type"] == "state":
-                        getattr(self, action["state"])()
-                    else:
-                        getattr(self, action["type"])(action)
-                except AttributeError:
-                    self.action(action)
+                # process action
+                self.action(action)
