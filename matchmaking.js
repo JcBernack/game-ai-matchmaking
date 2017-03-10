@@ -102,17 +102,19 @@ const MatchmakingFsm = machina.Fsm.extend({
                     console.log("Invalid move by client", id, move);
                     this.handle("abortMatch");
                     this.emit("dropClient", id);
+                    this.removePlayer(id);
+                    this.transition("startMatch");
                 }
             },
             timeout: function () {
                 console.log("Client move timeout");
                 this.handle("abortMatch");
+                this.transition("startMatch");
             },
             abortMatch: function () {
                 console.log("Aborting match");
                 this.emit("send", this.game.activePlayer, actions.state("abort"));
                 this.emit("send", this.game.inactivePlayer, actions.state("abort"));
-                this.transition("startMatch");
             },
             _onExit: function () {
                 clearTimeout(this.timer);
@@ -120,8 +122,7 @@ const MatchmakingFsm = machina.Fsm.extend({
         }
     },
 
-    clientConnected: function (id) {
-        console.log("Client connected", id);
+    addPlayer: function (id) {
         if (this.clients.length >= this.maxClients) {
             this.emit("dropClient", id);
             console.log("Server full");
@@ -132,17 +133,13 @@ const MatchmakingFsm = machina.Fsm.extend({
         this.emit("broadcast", actions.message("Player count: " + this.clients.length));
         this.handle("newPlayer", id);
     },
-    clientDisconnected: function (id) {
-        console.log("Client disconnected", id);
-        this.clients.splice(this.clients.indexOf(id), 1);
+    removePlayer: function (id) {
+        const index = this.clients.indexOf(id);
+        if (index == -1) return;
+        this.clients.splice(index, 1);
         this.emit("broadcast", actions.message("Player count: " + this.clients.length));
     },
-    clientError: function (id) {
-        console.log("Client error", id);
-        this.emit("dropClient", id);
-    },
-    clientAction: function (id, action) {
-        // console.log("Received client action", id, action);
+    playerAction: function (id, action) {
         if (action.type in this.dispatchers) {
             this.dispatchers[action.type].call(this, id, action);
         }

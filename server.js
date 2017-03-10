@@ -27,18 +27,20 @@ fsm.on("dropClient", dropClient);
 
 function connectionListener(socket) {
     const id = idCounter++;
+    console.log("Client connected", id);
     clients[id] = socket;
-    fsm.clientConnected(id);
+    fsm.addPlayer(id);
     carrier.carry(socket, function (line) {
         let action = null;
         try {
             action = JSON.parse(line);
         } catch (ex) {
             console.log("Error while parsing data from client", id);
-            fsm.clientError(id);
+            fsm.removePlayer(id);
             return;
         }
-        fsm.clientAction(id, action);
+        // console.log("Received client action", id, action);
+        fsm.playerAction(id, action);
     });
     socket.on("error", function (err) {
         // catch errors, but ignore them - otherwise the server would stop
@@ -46,8 +48,9 @@ function connectionListener(socket) {
         // console.log("Error on client", id, err);
     });
     socket.on("close", function () {
+        console.log("Client disconnected", id);
         delete clients[id];
-        fsm.clientDisconnected(id);
+        fsm.removePlayer(id);
     });
 }
 

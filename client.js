@@ -8,7 +8,7 @@ const actions = {
 };
 
 const socket = new net.Socket();
-socket.connect(5000, "127.0.0.1", function () {
+socket.connect(5000, "localhost", function () {
     console.log("Connected to", socket.address());
 });
 
