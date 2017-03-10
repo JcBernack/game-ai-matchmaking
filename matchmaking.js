@@ -55,7 +55,7 @@ const MatchmakingFsm = machina.Fsm.extend({
                 b = this.clients[b];
                 console.log(`Start match ${this.permutationIndex} ${a} vs ${b}`);
                 this.permutationIndex++;
-                this.game = new this.Game(a, b);
+                this.game = new this.GameType(a, b);
                 const description = actions.start(this.game.describe());
                 this.emit("send", a, description);
                 this.emit("send", b, description);
@@ -70,6 +70,7 @@ const MatchmakingFsm = machina.Fsm.extend({
                 }
                 switch (state[0]) {
                     case "move":
+                        this.moveState = state;
                         this.emit("send", state[1], actions.state("move"));
                         this.transition("clientMove");
                         break;
@@ -93,28 +94,28 @@ const MatchmakingFsm = machina.Fsm.extend({
                 this.timer = setTimeout(() => this.handle("timeout"), this.clientMoveTimeout);
             },
             move: function (id, move) {
-                const inactivePlayer = this.game.inactivePlayer;
                 if (this.game.apply(id, move)) {
                     console.log("Accepted move by client", id, move);
-                    this.emit("send", inactivePlayer, actions.update(move));
+                    this.emit("send", this.moveState[2], actions.update(move));
                     this.transition("nextMove");
                 } else {
                     console.log("Invalid move by client", id, move);
-                    this.handle("abortMatch");
+                    const currentlyPlaying = this.moveState.indexOf(id) != -1;
+                    if (currentlyPlaying) this.handle("sendAbort");
                     this.emit("dropClient", id);
                     this.removePlayer(id);
-                    this.transition("startMatch");
+                    if (currentlyPlaying) this.transition("startMatch");
                 }
             },
             timeout: function () {
                 console.log("Client move timeout");
-                this.handle("abortMatch");
+                this.handle("sendAbort");
                 this.transition("startMatch");
             },
-            abortMatch: function () {
+            sendAbort: function () {
                 console.log("Aborting match");
-                this.emit("send", this.game.activePlayer, actions.state("abort"));
-                this.emit("send", this.game.inactivePlayer, actions.state("abort"));
+                this.emit("send", this.moveState[1], actions.state("abort"));
+                this.emit("send", this.moveState[2], actions.state("abort"));
             },
             _onExit: function () {
                 clearTimeout(this.timer);
@@ -146,7 +147,7 @@ const MatchmakingFsm = machina.Fsm.extend({
     },
     dispatchers: {
         move: function (id, action) {
-            const move = this.Game.sanitizeMove(action);
+            const move = this.GameType.sanitizeMove(action);
             if (move) this.handle("move", id, move);
         }
     }
