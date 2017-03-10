@@ -16,6 +16,10 @@ To start a stupid random bot
     
     node client.js
 
+## Python client
+
+See the python folder for a working client in python. Inherit from the `GameClient` class and implement methods like shown in `Bob.py` or overwrite the `action(self, action)` method and process the actions yourself. For possible actions send by the server see below.
+
 ## Communication
 
 Connect to the server via tcp-sockets. The communication is text based and contains JSON objects encoded as UTF8 strings. It is important that every object ends with a line break "\n" to allow message separation. The server will immediately drop your connection on invalid messages.

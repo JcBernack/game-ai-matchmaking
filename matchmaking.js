@@ -53,7 +53,7 @@ const MatchmakingFsm = machina.Fsm.extend({
                 if (a <= b) b++;
                 a = this.clients[a];
                 b = this.clients[b];
-                console.log(`Start match ${this.permutationIndex} ${a} vs ${b}`);
+                console.log(`Start match ${this.permutationIndex}: ${a} vs ${b}`);
                 this.permutationIndex++;
                 this.game = new this.GameType(a, b);
                 const description = actions.start(this.game.describe());
