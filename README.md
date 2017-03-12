@@ -3,18 +3,19 @@
 ## Installation
 
     git clone git@github.com:JcBernack/game-ai-matchmaking.git
-    cd game-ai-matchmaking
+    cd game-ai-matchmaking/server/tcp
     npm install
 
 ## Execution
 
 To start the matchmaking server
     
-    node server.js
+    node server/tcp/server.js
     
-To start a stupid random bot
+To start a stupid random node or python bot
     
-    node client.js
+    node client/node/client.js
+    python client/python/client.py
 
 ## Python client
 
