@@ -1,6 +1,9 @@
-# installed packages
+# installed npm packages
 node_modules/
 
 # project files
 .idea/workspace.xml
 .idea/tasks.xml
+
+# python caches
+__pycache__/
